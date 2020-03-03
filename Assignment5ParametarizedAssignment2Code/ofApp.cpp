@@ -1,6 +1,7 @@
 #include "ofApp.h"
-ofImage screenshottedImage;
+#include <iterator>
 
+ofImage screenshottedImage;
 //--------------------------------------------------------------
 void ofApp::setup() {
 	isDrawingGui = true;
@@ -16,11 +17,26 @@ void ofApp::setup() {
 	gui.add(decreasingSizeModifier.set("Decreasing Size modifier", 0.00015f, 0.00010f, 0.00050f));
 	gui.add(isIncreasingMovementX.set("Move Opposite CurrentX", true));
 	gui.add(isIncreasingMovementY.set("Move Opposite CurrentY", true));
-	gui.add(triggerTheColors.set("Trigger The Colors!", false));
-	gui.add(triggerTheRotation.set("Trigger The Rotation!", true));
+	gui.add(triggerTheColors.set("Trigger Colors!", false));
+	gui.add(triggerTheRotation.set("Trigger Rotation!", true));
+	gui.add(triggerMultiColorGradient.set("Trigger Multi Gradient!", false));
+	gui.add(triggerGradientShifter.set("Trigger Gradient Shifter!", false));
+	gui.add(gradientShifter.set("Gradient Shifter", 1, 0, 255));
+	gui.add(triggerGradientBrightness.set("TriggerGradientBrightness!", false));
+	gui.add(gradientBrightness.set("GradientBrightness", 254, 0, 255));
+	gui.add(triggerSingleColorGradient.set("Trigger Single Gradient!", false));
+	gui.add(singleGradientcolorChoice.set("Single Gradient Color", ofColor(255, 0, 0), ofColor(0), ofColor(255)));
 	gui.add(screenShot.set("Screenshot"));
 
+	//Gradient Stuff
+	isIncreasingGradientBrightness = true;
+	hueValue = 0;
+	saturationValue = 0;
 
+	//for in triggerGradientShift Mode
+	isIncreasingGradientShift = true;
+	maxGradientBrightnessShift = 255;
+	minGradientBrightnessShift = 0;
 
 	//sizeModifier = 0.00015f;
 	isIncreasingSize = true;
@@ -37,11 +53,11 @@ void ofApp::setup() {
 	movementY = 500;
 
 	//screen size
-	window_width = 1900;
-	window_height = 1000;
+	//window_width = 1900;
+	window_width = ofGetWidth();
+	//window_height = 1000;
+	window_height = ofGetHeight();
 
-	//isIncreasingMovementX = true;
-	//isIncreasingMovementY = true;
 
 	//movementModifier = 3;
 
@@ -52,66 +68,132 @@ void ofApp::setup() {
 	//ofSetFrameRate(15);
 	ofSetFrameRate(30);
 	ofSetBackgroundColor(0, 0, 0); //pure black
+	
+	//MUSIC HANDLING
+	musicCounter = 0;
+	myPlayer.load(musicList[musicCounter] + ".mp3");
+	myPlayer.play();
+
+
+
 }
 
 //--------------------------------------------------------------
 void ofApp::update() {
+	if (!myPlayer.isPlaying()) {
+		++musicCounter;
+		//if (musicCounter >= sizeof(musicList)) { DIDN'T WORK
+		//if (musicCounter >= musicList->size()) { DIDN'T WORK EITHER
+		int lengthOfArray = sizeof(musicList) / sizeof(*musicList); //THIS ACTUALLY WORKED WHICH IS JUST WOW
+		if (musicCounter >= lengthOfArray ) {
+			musicCounter = 0;
+		}
+		myPlayer.load(musicList[musicCounter] + ".mp3");
+		myPlayer.play();
+	}
+
+	if (window_width != ofGetWidth()) {
+		window_width = ofGetWidth();
+	}
+	if (window_height != ofGetHeight()) {
+		window_height = ofGetHeight();
+	}
+	
+	if ((triggerMultiColorGradient || triggerSingleColorGradient) && triggerGradientShifter && !triggerGradientBrightness) {
+		triggerGradientBrightness.set("TriggerGradientBrightness!", false);
+		if (isIncreasingGradientShift)
+		{
+			++gradientShifter;
+		}
+		else {
+			--gradientShifter;
+		}
+	}
+	else if ((triggerMultiColorGradient || triggerSingleColorGradient) && !triggerGradientShifter && triggerGradientBrightness) {
+		triggerGradientShifter.set("Trigger Gradient Shifter!", false);
+		if (isIncreasingGradientBrightness)
+		{
+			++gradientBrightness;
+		}
+		else {
+			--gradientBrightness;
+		}
+	}
+
+	//toggles between increasing and decreasing gradient shifts
+	if (gradientShifter >= maxGradientBrightnessShift) {
+		isIncreasingGradientShift = false;
+	}
+	else if (gradientShifter <= minGradientBrightnessShift) {
+		isIncreasingGradientShift = true;
+	}
+
+	//toggles between increasing and decreasing brightness shifts
+	if (gradientBrightness >= maxGradientBrightnessShift) {
+		isIncreasingGradientBrightness = false;
+	}
+	else if (gradientBrightness <= minGradientBrightnessShift) {
+		isIncreasingGradientBrightness = true;
+	}
 	//ofSetColor(redComponent, greenComponent, blueComponent);
 	ofSetCircleResolution(circleResolution);
 	//increase/decrease each component color separately to show a better range of colors for our pulsating circles
-	if (triggerTheColors) {
-		if (isIncreasingRColor) {
+	if ((!triggerMultiColorGradient && !triggerSingleColorGradient) && triggerTheColors) {
+		if (isIncreasingRColor) { 
 			++redComponent;
-			ofSetColor(redComponent, greenComponent, blueComponent);
 		}
 		else {
 			--redComponent;
-			ofSetColor(redComponent, greenComponent, blueComponent);
 		}
 
 		if (isIncreasingGColor) {
 			++greenComponent;
-			ofSetColor(redComponent, greenComponent, blueComponent);
 		}
 		else {
 			--greenComponent;
-			ofSetColor(redComponent, greenComponent, blueComponent);
 		}
 
 		if (isIncreasingBColor) {
 			++blueComponent;
-			ofSetColor(redComponent, greenComponent, blueComponent);
 		}
 		else {
 			--blueComponent;
-			ofSetColor(redComponent, greenComponent, blueComponent);
+		}
+		ofSetColor(redComponent, greenComponent, blueComponent);
+
+
+		//toggles between incrementing and decrementing the color components when they hit certain minimums/maximums 
+		if (redComponent >= maxColor) {
+			isIncreasingRColor = false;
+		}
+		else if (redComponent <= minColor) {
+			isIncreasingRColor = true;
+		}
+
+		if (greenComponent >= maxColor) {
+			isIncreasingGColor = false;
+		}
+		else if (greenComponent <= minColor) {
+			isIncreasingGColor = true;
+		}
+
+		if (blueComponent >= maxColor) {
+			isIncreasingBColor = false;
+		}
+		else if (blueComponent <= minColor) {
+			isIncreasingBColor = true;
 		}
 	}
-	else {
+	if(!triggerTheColors && !triggerMultiColorGradient && !triggerSingleColorGradient){
 		ofSetColor(redComponent, greenComponent, blueComponent);
 	}
-
-	//toggles between incrementing and decrementing the color components when they hit certain minimums/maximums 
-	if (redComponent >= maxColor) {
-		isIncreasingRColor = false;
-	}
-	else if (redComponent <= minColor) {
-		isIncreasingRColor = true;
+	if (!triggerMultiColorGradient && !triggerSingleColorGradient) {
+		triggerGradientShifter.set("Trigger Gradient Shifter!", false);
+		triggerGradientBrightness.set("TriggerGradientBrightness!", false);
 	}
 
-	if (greenComponent >= maxColor) {
-		isIncreasingGColor = false;
-	}
-	else if (greenComponent <= minColor) {
-		isIncreasingGColor = true;
-	}
 
-	if (blueComponent >= maxColor) {
-		isIncreasingBColor = false;
-	}
-	else if (blueComponent <= minColor) {
-		isIncreasingBColor = true;
-	}
+	
 
 	//toggles between increasing and decreasing circle size
 	if (currentCircleSize >= maxCircleSize) {
@@ -159,6 +241,23 @@ void ofApp::draw() {
 	//draw the circles for each row and each column
 	for (int x = -window_width; x < window_width + 50; x += 50)
 	{
+		if (triggerMultiColorGradient) {
+			color = singleGradientcolorChoice;
+			triggerTheColors.set("Trigger Colors!", false);
+			triggerSingleColorGradient.set("Trigger Single Gradient!", false);
+			hueValue = gradientShifter + ofMap(x, -window_width, window_width + 50, 0, 255);
+			color.setHsb( hueValue % 255, 255, gradientBrightness);
+			ofSetColor(color);
+		}
+		else if (triggerSingleColorGradient) {
+			triggerTheColors.set("Trigger Colors!", false);
+			triggerMultiColorGradient.set("Trigger Multi Gradient!", false);
+			color = singleGradientcolorChoice;
+			saturationValue = gradientShifter + ofMap(x, -window_width, window_width + 50, 0, 255);
+			//color.setHsb(color.getHue(), saturationValue, gradientBrightness);
+			color.setHsb(color.getHue(), saturationValue - (int(saturationValue / 255) * (saturationValue % 255)), gradientBrightness);
+			ofSetColor(color);
+		}
 		for (int y = -window_height; y < window_height + 50; y += 50)
 		{
 			if (isIncreasingSize) {

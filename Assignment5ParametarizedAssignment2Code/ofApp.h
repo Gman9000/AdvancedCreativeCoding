@@ -1,7 +1,12 @@
 #pragma once
-
+//#include <iostream>
+#include <list> 
 #include "ofMain.h"
 #include "ofxGui.h"
+#include <iterator>
+
+
+
 
 
 class ofApp : public ofBaseApp {
@@ -25,11 +30,28 @@ public:
 	ofParameter<bool> isIncreasingMovementY;
 	ofParameter<bool> triggerTheColors;
 	ofParameter<bool> triggerTheRotation;
+	ofParameter<bool> triggerMultiColorGradient;
+	ofParameter<bool> triggerSingleColorGradient;
+	ofParameter<bool> triggerGradientShifter;
+	ofParameter<int> gradientShifter;
+	ofParameter<bool> triggerGradientBrightness;
+	ofParameter<int> gradientBrightness;
+	ofParameter<ofColor> singleGradientcolorChoice;
 	ofParameter<string> screenShot;
-
-
-
-
+	ofColor color;
+	
+	ofSoundPlayer myPlayer;
+	// MUSIC BY https://www.fesliyanstudios.com/royalty-free-music/downloads-c/lofi-hip-hop-music/37
+	string musicList[10] = { "Bobbin","Lazy_Day","Feels_Good", "Out_And_About", "Done_With_Work", "Vibes", "Homework", "I_Got_This", "Chill_Gaming", "On_My_Own" };
+	//string musicList[1] = { "Bobbin.mp3" };
+	int musicCounter;
+	//string musicItr = *musicList.begin();
+	bool isIncreasingGradientShift;
+	bool isIncreasingGradientBrightness;
+	int maxGradientBrightnessShift;
+	int minGradientBrightnessShift;
+	int hueValue;
+	int saturationValue;
 
 	bool isDrawingGui;
 
