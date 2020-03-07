@@ -4,6 +4,7 @@
 #include "ofMain.h"
 #include "ofxGui.h"
 #include <iterator>
+//#include "circle.h"
 
 
 
@@ -17,9 +18,16 @@ public:
 	void draw();
 
 	ofxPanel gui;
+	ofParameter<bool> triggerFill;
+	ofParameter<int> lineWidth;
+	ofParameter<float> maxCircleSize;
+	ofParameter<float> minCircleSize;
+	ofParameter<int> xSpacing;
+	ofParameter<int> ySpacing;
 	ofParameter<int> redComponent;
 	ofParameter<int> greenComponent;
 	ofParameter<int> blueComponent;
+	ofParameter<int> alphaComponent;
 	ofParameter<int> circleResolution;
 	ofParameter<int> movementModifierX;
 	ofParameter<int> movementModifierY;
@@ -37,9 +45,13 @@ public:
 	ofParameter<bool> triggerGradientBrightness;
 	ofParameter<int> gradientBrightness;
 	ofParameter<ofColor> singleGradientcolorChoice;
+	ofParameter<ofColor> backgroundColor;
 	ofParameter<string> screenShot;
 	ofColor color;
-	
+	//vector<circle*> circles;
+
+	bool isPaused;
+
 	ofSoundPlayer myPlayer;
 	// MUSIC BY https://www.fesliyanstudios.com/royalty-free-music/downloads-c/lofi-hip-hop-music/37
 	string musicList[10] = { "Bobbin","Lazy_Day","Feels_Good", "Out_And_About", "Done_With_Work", "Vibes", "Homework", "I_Got_This", "Chill_Gaming", "On_My_Own" };
@@ -56,9 +68,9 @@ public:
 	bool isDrawingGui;
 
 
-	float maxCircleSize;
+	//float maxCircleSize;
 	float currentCircleSize;
-	float minCircleSize;
+	//float minCircleSize;
 	bool isIncreasingSize;
 	//float sizeModifier;
 

@@ -6,15 +6,24 @@ ofImage screenshottedImage;
 void ofApp::setup() {
 	isDrawingGui = true;
 	gui.setup("X->hide|S->screenshot");
+	gui.add(triggerFill.set("Trigger Fill", true));
+	gui.add(lineWidth.set("line Width", 1, 1, 20));
+	gui.add(maxCircleSize.set("max Circle size", 30.0f, 0.0f, 60.0f));
+	gui.add(minCircleSize.set("min Circle Size", 5.0f, 0.0f, 15.0f));
+	gui.add(xSpacing.set("x Spacing", 50, 50, 150));
+	gui.add(ySpacing.set("y spacing", 50, 50, 150));
 	gui.add(circleResolution.set("Circle Resolution", 5, 3, 12));
 	gui.add(redComponent.set("Red Color Component", 50, 0, 255));
 	gui.add(greenComponent.set("Green Color Component", 100, 0, 255));
 	gui.add(blueComponent.set("Blue Color Component", 150, 0, 255));
+	gui.add(alphaComponent.set("alpha Color Component", 250, 100, 255));
 	gui.add(movementModifierX.set("X movement modifier", 3, 1, 10));
 	gui.add(movementModifierY.set("Y movement modifier", 3, 1, 10));
 	gui.add(rotationModifier.set("Rotation Speed", 20, 10, 30));
 	gui.add(increasingSizeModifier.set("Increasing Size modifier", 0.00015f, 0.00010f, 0.00050f));
 	gui.add(decreasingSizeModifier.set("Decreasing Size modifier", 0.00015f, 0.00010f, 0.00050f));
+	//gui.add(increasingSizeModifier.set("Increasing Size modifier", 1.0f, 0.5f, 2.0f));
+	//gui.add(decreasingSizeModifier.set("Decreasing Size modifier", 1.0f, 0.5f, 2.0f));
 	gui.add(isIncreasingMovementX.set("Move Opposite CurrentX", true));
 	gui.add(isIncreasingMovementY.set("Move Opposite CurrentY", true));
 	gui.add(triggerTheColors.set("Trigger Colors!", false));
@@ -26,7 +35,9 @@ void ofApp::setup() {
 	gui.add(gradientBrightness.set("GradientBrightness", 254, 0, 255));
 	gui.add(triggerSingleColorGradient.set("Trigger Single Gradient!", false));
 	gui.add(singleGradientcolorChoice.set("Single Gradient Color", ofColor(255, 0, 0), ofColor(0), ofColor(255)));
+	gui.add(backgroundColor.set("background Color", ofColor(0, 0, 0), ofColor(0), ofColor(255)));
 	gui.add(screenShot.set("Screenshot"));
+	isPaused = false;
 
 	//Gradient Stuff
 	isIncreasingGradientBrightness = true;
@@ -40,9 +51,9 @@ void ofApp::setup() {
 
 	//sizeModifier = 0.00015f;
 	isIncreasingSize = true;
-	maxCircleSize = 30.0f;
+	//maxCircleSize = 30.0f;
 	currentCircleSize = 15.0f;
-	minCircleSize = 5.0f;
+	//minCircleSize = 5.0f;
 
 	//for in trigger the colors mode
 	maxColor = 255;
@@ -80,10 +91,17 @@ void ofApp::setup() {
 
 //--------------------------------------------------------------
 void ofApp::update() {
-	if (!myPlayer.isPlaying()) {
+	if (triggerFill) {
+		ofSetLineWidth(1);
+		ofFill();
+	}
+	else {
+		ofSetLineWidth(lineWidth);
+		ofNoFill();
+	}
+	ofSetBackgroundColor(backgroundColor);
+	if (!myPlayer.isPlaying() && !isPaused) {
 		++musicCounter;
-		//if (musicCounter >= sizeof(musicList)) { DIDN'T WORK
-		//if (musicCounter >= musicList->size()) { DIDN'T WORK EITHER
 		int lengthOfArray = sizeof(musicList) / sizeof(*musicList); //THIS ACTUALLY WORKED WHICH IS JUST WOW
 		if (musicCounter >= lengthOfArray ) {
 			musicCounter = 0;
@@ -185,7 +203,7 @@ void ofApp::update() {
 		}
 	}
 	if(!triggerTheColors && !triggerMultiColorGradient && !triggerSingleColorGradient){
-		ofSetColor(redComponent, greenComponent, blueComponent);
+		ofSetColor(redComponent, greenComponent, blueComponent,alphaComponent);
 	}
 	if (!triggerMultiColorGradient && !triggerSingleColorGradient) {
 		triggerGradientShifter.set("Trigger Gradient Shifter!", false);
@@ -239,10 +257,11 @@ void ofApp::update() {
 //--------------------------------------------------------------
 void ofApp::draw() {
 	//draw the circles for each row and each column
-	for (int x = -window_width; x < window_width + 50; x += 50)
+	for (int x = -window_width; x < window_width + 50; x += xSpacing)
 	{
 		if (triggerMultiColorGradient) {
 			color = singleGradientcolorChoice;
+			color.set(color.r, color.g, color.b, alphaComponent);
 			triggerTheColors.set("Trigger Colors!", false);
 			triggerSingleColorGradient.set("Trigger Single Gradient!", false);
 			hueValue = gradientShifter + ofMap(x, -window_width, window_width + 50, 0, 255);
@@ -253,12 +272,13 @@ void ofApp::draw() {
 			triggerTheColors.set("Trigger Colors!", false);
 			triggerMultiColorGradient.set("Trigger Multi Gradient!", false);
 			color = singleGradientcolorChoice;
+			color.set(color.r, color.g, color.b, alphaComponent);
 			saturationValue = gradientShifter + ofMap(x, -window_width, window_width + 50, 0, 255);
 			//color.setHsb(color.getHue(), saturationValue, gradientBrightness);
 			color.setHsb(color.getHue(), saturationValue - (int(saturationValue / 255) * (saturationValue % 255)), gradientBrightness);
 			ofSetColor(color);
 		}
-		for (int y = -window_height; y < window_height + 50; y += 50)
+		for (int y = -window_height; y < window_height + 50; y += ySpacing)
 		{
 			if (isIncreasingSize) {
 				currentCircleSize += increasingSizeModifier;
@@ -305,6 +325,16 @@ void ofApp::keyPressed(int key) {
 		screenshottedImage.grabScreen(0, 0, ofGetWidth(), ofGetHeight());
 		screenshottedImage.save(screenShot.toString() + ".png");
 		screenShot.set("Screenshot Saved!");
+	}
+	else if (key == OF_KEY_RETURN) {
+		if (myPlayer.isPlaying()) {
+			isPaused = true;
+			myPlayer.stop();
+		}
+		else {
+			isPaused = false;
+			myPlayer.play();
+		}
 	}
 }
 
