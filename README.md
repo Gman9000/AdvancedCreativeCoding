@@ -9,3 +9,5 @@
 --Assignment 4: Works without Human Interaction. It's my attempt at recreating some photos I took out on these streets :D 
 
 --Assignment 5: Customize-able artwork of assignment 2 and it's super cool!
+
+--Dazzle: Fractal Artwork with Music Visualization implemented
