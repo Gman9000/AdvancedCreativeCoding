@@ -34,8 +34,8 @@ class ofApp : public ofBaseApp{
 		bool isPaused;
 		bool toggleVisuals;
 		// MUSIC BY https://www.fesliyanstudios.com/royalty-free-music/downloads-c/lofi-hip-hop-music/37
-		//string musicList[10] = { "Bobbin","Lazy_Day","Feels_Good", "Out_And_About", "Done_With_Work", "Vibes", "Homework", "I_Got_This", "Chill_Gaming", "On_My_Own" };
-		string musicList[1] = { "Bobbin" };
+		string musicList[10] = { "Lazy_Day","Feels_Good", "Out_And_About", "Done_With_Work","Bobbin","Vibes", "Homework", "I_Got_This", "Chill_Gaming", "On_My_Own" };
+		//string musicList[1] = { "Bobbin" };
 		int musicCounter;
 
 		bool isIncreasingGradientShift;

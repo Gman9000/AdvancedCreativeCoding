@@ -11,11 +11,11 @@ void ofApp::setup(){
 	gui.setup("X->hide|S->screenshot");
 	gui.add(lineThickness.set("Line Thickness", 1, 1, 20));
 	gui.add(circleResolution.set("Circle Resolution", 4, 3, 30));
-	gui.add(circleRadius.set("Circle Radius", 500, 100, 1000));
+	gui.add(circleRadius.set("Circle Radius", 1000, 100, 1000));
 	gui.add(fractalThreshold.set("Fractal Threshold", 0.002, 0.002, 300));
 	gui.add(triggerMusicVisualization.set("Trigger Visualz!", false));
 	//gui.add(circleResolution.set("Circle Resolution", 4, 3, 30));
-	gui.add(musicVisualizationChilltensity.set("visualz Chilltensity", 2, 1, 6));
+	gui.add(musicVisualizationChilltensity.set("visualz Chilltensity", 10, 1, 10));
 	gui.add(bands.set("band number", 64, 4, 64)); 
 	gui.add(triggerXMotion.set("Trigger X Motion!", false));
 	gui.add(triggerYMotion.set("Trigger Y Motion!", false));
@@ -217,6 +217,7 @@ void ofApp::draw(){
 					}
 				}
 				else {
+					(*itr)->setRadius((*itr)->getOriginalRadius());
 					if (triggerMultiColorGradient) {
 						(*itr)->drawCircleXY(x, y, color);
 					}
@@ -246,6 +247,7 @@ void ofApp::draw(){
 					}
 				}
 				else {
+					(*itr)->setRadius((*itr)->getOriginalRadius());
 					if (triggerMultiColorGradient) {
 						(*itr)->drawCircle(color);
 					}
