@@ -17,6 +17,7 @@ class ofApp : public ofBaseApp{
 		ofParameter<float> circleRadius;
 		ofParameter<float> fractalThreshold;
 		ofParameter<bool> triggerMusicVisualization;
+		ofParameter<int> musicVisualizationChilltensity;
 		ofParameter<int> bands;
 		ofParameter<bool> triggerXMotion;
 		ofParameter<bool> triggerYMotion;
@@ -61,6 +62,7 @@ class ofApp : public ofBaseApp{
 		float * fftSmooth;
 		//int bands;
 		float previousTempCalculation;
+		float calculationThreshold;
 
 		void keyPressed(int key);
 		void keyReleased(int key);

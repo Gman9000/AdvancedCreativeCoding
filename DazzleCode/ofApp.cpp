@@ -14,7 +14,8 @@ void ofApp::setup(){
 	gui.add(circleRadius.set("Circle Radius", 500, 100, 1000));
 	gui.add(fractalThreshold.set("Fractal Threshold", 0.002, 0.002, 300));
 	gui.add(triggerMusicVisualization.set("Trigger Visualz!", false));
-	gui.add(circleResolution.set("Circle Resolution", 4, 3, 30));
+	//gui.add(circleResolution.set("Circle Resolution", 4, 3, 30));
+	gui.add(musicVisualizationChilltensity.set("visualz Chilltensity", 2, 1, 6));
 	gui.add(bands.set("band number", 64, 4, 64)); 
 	gui.add(triggerXMotion.set("Trigger X Motion!", false));
 	gui.add(triggerYMotion.set("Trigger Y Motion!", false));
@@ -64,6 +65,7 @@ void ofApp::setup(){
 
 	//hackandslash
 	previousTempCalculation = 0.0f;
+	calculationThreshold = 1.0f;
 
 }
 
@@ -134,32 +136,41 @@ void ofApp::draw(){
 		{
 			for (vector<FractalCircle*>::iterator itr = circles.begin(); itr != circles.end(); ++itr) {
 				float x = ofMap(cos(angle), -1, 1, 0, float(ofGetWindowWidth()));
-				if (triggerMultiColorGradient) {
-					(*itr)->drawCircleX(x, color);
+				if (triggerMusicVisualization) {
+					
+					for (int i = 0; i < bands; i++) {
+						float tempCalculation = (*itr)->getOriginalRadius() + abs((fftSmooth[i] * (*itr)->getOriginalRadius()) / musicVisualizationChilltensity);
+						if (abs(tempCalculation - previousTempCalculation) > calculationThreshold) {
+							(*itr)->setRadius(tempCalculation); //MUSIC VISUALIZAITON VIA RADIUS SHIFTINGS
+							if (triggerMultiColorGradient) {
+								(*itr)->drawCircleX(x, color);
+							}
+							else {
+								(*itr)->drawCircleX(x, singleFractalColor);
+							}
+						}
+						previousTempCalculation = tempCalculation;
+					}
 				}
 				else {
-					(*itr)->drawCircleX(x, singleFractalColor);
+					(*itr)->setRadius((*itr)->getOriginalRadius());
+					if (triggerMultiColorGradient) {
+						(*itr)->drawCircleX(x, color);
+					}
+					else {
+						(*itr)->drawCircleX(x, singleFractalColor);
+					}
 				}
 				angle += angleVar;
-
 			}
 		}
 		else if (!triggerXMotion && triggerYMotion) {
 			for (vector<FractalCircle*>::iterator itr = circles.begin(); itr != circles.end(); ++itr) {
+				float y = ofMap(sin(angle), -1, 1, 0, float(ofGetWindowHeight()));
 				if (triggerMusicVisualization) {
-					float y = ofMap(sin(angle), -1, 1, 0, float(ofGetWindowHeight()));
-					for (int i = 0; i < bands; i++) { //LOOP THROUGH THE BANDS TO DO MUSIC VISUALIZATION WHICH REKTS MY PERFORMANCE A LOT
-						// also i draw less circles for some UNKNOWN REASON
-						//float y = ofMap(sin(angle), -1, 1, 0, float(ofGetWindowHeight()));
-						//float tempCalculation = -(fftSmooth[i] * (*itr)->getOriginalRadius());
-						//float tempCalculation = abs((fftSmooth[i] * (*itr)->getOriginalRadius()));
-						float tempCalculation = (*itr)->getOriginalRadius() + abs((fftSmooth[i] * (*itr)->getOriginalRadius()));
-
-						//hack and slash
-						/*if (tempCalculation < 3.0f) {
-							tempCalculation = 3.0f;
-						}*/
-						if (abs(tempCalculation - previousTempCalculation) > 1.0f) {
+					for (int i = 0; i < bands; i++) { 
+						float tempCalculation = (*itr)->getOriginalRadius() + abs( (fftSmooth[i] * (*itr)->getOriginalRadius()) / musicVisualizationChilltensity);
+						if (abs(tempCalculation - previousTempCalculation) > calculationThreshold) {
 							(*itr)->setRadius(tempCalculation); //MUSIC VISUALIZAITON VIA RADIUS SHIFTINGS
 							if (triggerMultiColorGradient) {
 								(*itr)->drawCircleY(y, color);
@@ -172,7 +183,6 @@ void ofApp::draw(){
 					}
 				}
 				else {
-					float y = ofMap(sin(angle), -1, 1, 0, float(ofGetWindowHeight()));
 					(*itr)->setRadius((*itr)->getOriginalRadius());
 					if (triggerMultiColorGradient) {
 						(*itr)->drawCircleY(y, color);
@@ -184,37 +194,67 @@ void ofApp::draw(){
 				}
 				angle += angleVar;
 			}
-			// EVERYTHING ELSE IS WHAT NORMALLY HAPPENS IN THIS SECTION OF CODE SO PERFORMANCE ON THOSE THINGS SHOULD NOT BE AN ISSUE.....
-			//AT LEAST I THINK SO....
+
 		}
-		// I COULD DO THE VISUALIZATION FOR OTHER MODES IN THIS WORK BUT I GOTTA FIX THE PERFORMANCE ISSUE FIRST
 		else if (triggerXMotion && triggerYMotion)
 		{
 			for (vector<FractalCircle*>::iterator itr = circles.begin(); itr != circles.end(); ++itr) {
 				float y = ofMap(sin(angle), -1, 1, 0, float(ofGetWindowHeight()));
 				float x = ofMap(cos(angle), -1, 1, 0, float(ofGetWindowWidth()));
-				if (triggerMultiColorGradient) {
-					(*itr)->drawCircleXY(x, y, color);
+				if (triggerMusicVisualization) {
+					for (int i = 0; i < bands; i++) {
+						float tempCalculation = (*itr)->getOriginalRadius() + abs((fftSmooth[i] * (*itr)->getOriginalRadius()) / musicVisualizationChilltensity);
+						if (abs(tempCalculation - previousTempCalculation) > calculationThreshold) {
+							(*itr)->setRadius(tempCalculation); //MUSIC VISUALIZAITON VIA RADIUS SHIFTINGS
+							if (triggerMultiColorGradient) {
+								(*itr)->drawCircleXY(x, y, color);
+							}
+							else {
+								(*itr)->drawCircleXY(x, y, singleFractalColor);
+							}
+						}
+						previousTempCalculation = tempCalculation;
+					}
 				}
 				else {
-					(*itr)->drawCircleXY(x, y, singleFractalColor);
+					if (triggerMultiColorGradient) {
+						(*itr)->drawCircleXY(x, y, color);
+					}
+					else {
+						(*itr)->drawCircleXY(x, y, singleFractalColor);
+					}
 				}
 				angle += angleVar;
-
 			}
 		}
 		else
 		{
 			for (vector<FractalCircle*>::iterator itr = circles.begin(); itr != circles.end(); ++itr) {
-				if (triggerMultiColorGradient) {
-					(*itr)->drawCircle(color);
+				if (triggerMusicVisualization) {
+					for (int i = 0; i < bands; i++) {
+						float tempCalculation = (*itr)->getOriginalRadius() + abs((fftSmooth[i] * (*itr)->getOriginalRadius()) / musicVisualizationChilltensity);
+						if (abs(tempCalculation - previousTempCalculation) > calculationThreshold) {
+							(*itr)->setRadius(tempCalculation); //MUSIC VISUALIZAITON VIA RADIUS SHIFTINGS
+							if (triggerMultiColorGradient) {
+								(*itr)->drawCircle(color);
+							}
+							else {
+								(*itr)->drawCircle(singleFractalColor);
+							}
+						}
+						previousTempCalculation = tempCalculation;
+					}
 				}
 				else {
-					(*itr)->drawCircle(singleFractalColor);
+					if (triggerMultiColorGradient) {
+						(*itr)->drawCircle(color);
+					}
+					else {
+						(*itr)->drawCircle(singleFractalColor);
+					}
 				}
 			}
 		}
-	
 
 	if (isDrawingGui) {
 		gui.draw();
