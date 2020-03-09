@@ -34,8 +34,8 @@ public:
 	ofParameter<int> rotationModifier;
 	ofParameter<float> increasingSizeModifier;
 	ofParameter<float> decreasingSizeModifier;
-	ofParameter<bool> isIncreasingMovementX;
-	ofParameter<bool> isIncreasingMovementY;
+	//ofParameter<bool> isIncreasingMovementX;
+	//ofParameter<bool> isIncreasingMovementY;
 	ofParameter<bool> triggerTheColors;
 	ofParameter<bool> triggerTheRotation;
 	ofParameter<bool> triggerMultiColorGradient;
@@ -78,8 +78,8 @@ public:
 	int movementY;
 	int window_width;
 	int window_height;
-	//bool isIncreasingMovementX;
-	//bool isIncreasingMovementY;
+	bool isIncreasingMovementX;
+	bool isIncreasingMovementY;
 	//int movementModifier;
 
 	//unsigned long actualTime;

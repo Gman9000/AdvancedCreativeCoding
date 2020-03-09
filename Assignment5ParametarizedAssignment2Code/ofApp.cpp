@@ -8,24 +8,25 @@ void ofApp::setup() {
 	gui.setup("X->hide|S->screenshot");
 	gui.add(triggerFill.set("Trigger Fill", true));
 	gui.add(lineWidth.set("line Width", 1, 1, 20));
-	gui.add(maxCircleSize.set("max Circle size", 30.0f, 0.0f, 60.0f));
-	gui.add(minCircleSize.set("min Circle Size", 5.0f, 0.0f, 15.0f));
+	gui.add(maxCircleSize.set("max Circle size", 60.0f, 20.0f, 60.0f));
+	gui.add(minCircleSize.set("min Circle Size", 5.0f, 1.0f, 15.0f));
 	gui.add(xSpacing.set("x Spacing", 50, 50, 150));
 	gui.add(ySpacing.set("y spacing", 50, 50, 150));
+	gui.add(movementModifierX.set("X movement modifier", 1, 1, 10));
+	gui.add(movementModifierY.set("Y movement modifier", 1, 1, 10));
+	gui.add(rotationModifier.set("Rotation Speed", 20, 10, 30));
 	gui.add(circleResolution.set("Circle Resolution", 5, 3, 12));
+	gui.add(increasingSizeModifier.set("Increasing Size modifier", 0.00010f, 0.00010f, 0.00050f));
+	gui.add(decreasingSizeModifier.set("Decreasing Size modifier", 0.00050f, 0.00010f, 0.00050f));
 	gui.add(redComponent.set("Red Color Component", 50, 0, 255));
 	gui.add(greenComponent.set("Green Color Component", 100, 0, 255));
 	gui.add(blueComponent.set("Blue Color Component", 150, 0, 255));
-	gui.add(alphaComponent.set("alpha Color Component", 250, 100, 255));
-	gui.add(movementModifierX.set("X movement modifier", 3, 1, 10));
-	gui.add(movementModifierY.set("Y movement modifier", 3, 1, 10));
-	gui.add(rotationModifier.set("Rotation Speed", 20, 10, 30));
-	gui.add(increasingSizeModifier.set("Increasing Size modifier", 0.00015f, 0.00010f, 0.00050f));
-	gui.add(decreasingSizeModifier.set("Decreasing Size modifier", 0.00015f, 0.00010f, 0.00050f));
+	gui.add(alphaComponent.set("alpha Color Component", 150, 100, 255));
+
 	//gui.add(increasingSizeModifier.set("Increasing Size modifier", 1.0f, 0.5f, 2.0f));
 	//gui.add(decreasingSizeModifier.set("Decreasing Size modifier", 1.0f, 0.5f, 2.0f));
-	gui.add(isIncreasingMovementX.set("Move Opposite CurrentX", true));
-	gui.add(isIncreasingMovementY.set("Move Opposite CurrentY", true));
+	//gui.add(isIncreasingMovementX.set("Move Opposite CurrentX", true));
+	//gui.add(isIncreasingMovementY.set("Move Opposite CurrentY", true));
 	gui.add(triggerTheColors.set("Trigger Colors!", false));
 	gui.add(triggerTheRotation.set("Trigger Rotation!", true));
 	gui.add(triggerMultiColorGradient.set("Trigger Multi Gradient!", false));
@@ -39,6 +40,8 @@ void ofApp::setup() {
 	gui.add(screenShot.set("Screenshot"));
 	isPaused = false;
 
+	isIncreasingMovementX = true;
+	isIncreasingMovementY = true;
 	//Gradient Stuff
 	isIncreasingGradientBrightness = true;
 	hueValue = 0;
@@ -84,6 +87,7 @@ void ofApp::setup() {
 	musicCounter = 0;
 	myPlayer.load(musicList[musicCounter] + ".mp3");
 	myPlayer.play();
+	myPlayer.setVolume(0);
 
 
 
@@ -177,7 +181,7 @@ void ofApp::update() {
 		else {
 			--blueComponent;
 		}
-		ofSetColor(redComponent, greenComponent, blueComponent);
+		ofSetColor(redComponent, greenComponent, blueComponent,alphaComponent);
 
 
 		//toggles between incrementing and decrementing the color components when they hit certain minimums/maximums 
@@ -261,21 +265,24 @@ void ofApp::draw() {
 	{
 		if (triggerMultiColorGradient) {
 			color = singleGradientcolorChoice;
-			color.set(color.r, color.g, color.b, alphaComponent);
+			//color.set(color.r, color.g, color.b, alphaComponent);
 			triggerTheColors.set("Trigger Colors!", false);
 			triggerSingleColorGradient.set("Trigger Single Gradient!", false);
 			hueValue = gradientShifter + ofMap(x, -window_width, window_width + 50, 0, 255);
 			color.setHsb( hueValue % 255, 255, gradientBrightness);
+			color.a = alphaComponent;
 			ofSetColor(color);
 		}
 		else if (triggerSingleColorGradient) {
 			triggerTheColors.set("Trigger Colors!", false);
 			triggerMultiColorGradient.set("Trigger Multi Gradient!", false);
 			color = singleGradientcolorChoice;
-			color.set(color.r, color.g, color.b, alphaComponent);
+			//color.set(color.r, color.g, color.b, alphaComponent);
 			saturationValue = gradientShifter + ofMap(x, -window_width, window_width + 50, 0, 255);
 			//color.setHsb(color.getHue(), saturationValue, gradientBrightness);
 			color.setHsb(color.getHue(), saturationValue - (int(saturationValue / 255) * (saturationValue % 255)), gradientBrightness);
+			color.a = alphaComponent;
+
 			ofSetColor(color);
 		}
 		for (int y = -window_height; y < window_height + 50; y += ySpacing)
