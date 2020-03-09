@@ -9,6 +9,7 @@ void ofApp::setup(){
 	ofNoFill();
 	isDrawingGui = true;
 	gui.setup("X->hide|S->screenshot");
+	//gui.setup("enter->toggler music");
 	gui.add(lineThickness.set("Line Thickness", 1, 1, 20));
 	gui.add(circleResolution.set("Circle Resolution", 4, 3, 30));
 	gui.add(circleRadius.set("Circle Radius", 1000, 100, 1000));
@@ -50,7 +51,8 @@ void ofApp::setup(){
 	minGradientShift = 0;
 	
 	//MUSIC HANDLING
-	isPaused = false;
+	isMusicPaused = false;
+	hasPausedVisualizations = false;
 	musicCounter = 0;
 	myPlayer.load(musicList[musicCounter] + ".mp3");
 	fftSmooth = new float[8192];
@@ -80,7 +82,7 @@ void ofApp::update(){
 			fftSmooth[i] = value[i];
 		}
 	}
-	if (!myPlayer.isPlaying() && !isPaused) {
+	if (!myPlayer.isPlaying() && !isMusicPaused) {
 		++musicCounter;
 		int lengthOfArray = sizeof(musicList) / sizeof(*musicList); //THIS ACTUALLY WORKED WHICH IS JUST WOW
 		if (musicCounter >= lengthOfArray) {
@@ -286,18 +288,24 @@ void ofApp::keyPressed(int key){
 		screenShot.set("Screenshot Saved!");
 	}
 	else if (key == OF_KEY_RETURN) {
-		if (myPlayer.isPlaying()) {
-			isPaused = true;
-			myPlayer.stop();
+		if (!isMusicPaused) {
+			isMusicPaused = true;
+			if (triggerMusicVisualization) {
+				hasPausedVisualizations = true;
+				triggerMusicVisualization.set("Trigger Visualz!", false);
+			}
+			myPlayer.setPaused(true);
 		}
 		else {
-			isPaused = false;
-			myPlayer.play();
+			isMusicPaused = false;
+			if (hasPausedVisualizations) {
+				triggerMusicVisualization.set("Trigger Visualz!", true);
+				hasPausedVisualizations = false;
+			}
+			myPlayer.setPaused(false);
+			//myPlayer.play();
 		}
 	}
-	/*else if (key == OF_KEY_RETURN) {
-		if(myPlayer.isPlaying())
-	}*/
 }
 
 //--------------------------------------------------------------

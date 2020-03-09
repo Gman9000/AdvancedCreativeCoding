@@ -31,7 +31,8 @@ class ofApp : public ofBaseApp{
 		float hueModifier;
 
 		ofSoundPlayer myPlayer;
-		bool isPaused;
+		bool isMusicPaused;
+		bool hasPausedVisualizations;
 		bool toggleVisuals;
 		// MUSIC BY https://www.fesliyanstudios.com/royalty-free-music/downloads-c/lofi-hip-hop-music/37
 		string musicList[10] = { "Lazy_Day","Feels_Good", "Out_And_About", "Done_With_Work","Bobbin","Vibes", "Homework", "I_Got_This", "Chill_Gaming", "On_My_Own" };
