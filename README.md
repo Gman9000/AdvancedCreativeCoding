@@ -11,3 +11,7 @@
 --Assignment 5: Customize-able artwork of assignment 2 and it's super cool!
 
 --Dazzle: Fractal Artwork with Music Visualization implemented
+
+--Software Instruction 1: Moving Artwork based on the following instruction: A surface filled with circles of the same size moving at a relatively slow speed. Show the intersections of any circles that come into contact with each other but do not show the intersecting circles themselves.
+
+-- Software Instruction 2: Still Artwork based on the following instruction: A surface filled with at least 100 lines connected to a single point.
