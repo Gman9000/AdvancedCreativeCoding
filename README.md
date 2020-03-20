@@ -15,3 +15,5 @@
 --Software Instruction 1: Moving Artwork based on the following instruction: A surface filled with circles of the same size moving at a relatively slow speed. Show the intersections of any circles that come into contact with each other but do not show the intersecting circles themselves.
 
 -- Software Instruction 2: Still Artwork based on the following instruction: A surface filled with at least 100 lines connected to a single point.
+
+-- Software Instruction 3: Moving Artwork based on the following instruction: A surface with at least 100 lines connected to a single ever changing point. Show the connections in the present as the brightest while past connections fade away.
