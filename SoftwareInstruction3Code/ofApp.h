@@ -10,9 +10,7 @@ public:
 	//gui stuff
 	ofxPanel gui;
 	ofParameter<ofColor> lineColor;
-	//ofParameter<int> lineThickness;
 	ofParameter<int> numberOfPoints;
-	//ofParameter<ofColor> backGroundColor;
 	ofParameter<bool> timeToChangePoints;
 	ofParameter<bool> toggleColorChange;
 	ofParameter<string> screenShot;

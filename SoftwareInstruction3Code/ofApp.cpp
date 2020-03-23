@@ -10,6 +10,7 @@ void ofApp::setup() {
 	
 	//Frame Rate Stuff
 	ofSetFrameRate(30);
+
 	//screen size
 	window_width = 1000;
 	window_height = 1000;
@@ -19,9 +20,7 @@ void ofApp::setup() {
 	isDrawingGui = true;
 	gui.setup("X->hide|S->screenshot");
 	gui.add(lineColor.set("Line Color", ofColor(0, 255, 255), ofColor(0), ofColor(255)));
-	//gui.add(lineThickness.set("Line Thickness", 1, 1, 20));
 	gui.add(numberOfPoints.set("number of points", 100, 100, 200));
-	//gui.add(backGroundColor.set("Background Color", ofColor(0, 0, 0), ofColor(0), ofColor(255)));
 	gui.add(timeToChangePoints.set("Toggle Points", false));
 	gui.add(toggleColorChange.set("Toggle Changing Colors", false));
 	gui.add(screenShot.set("Screenshot"));
@@ -96,7 +95,6 @@ void ofApp::update() {
 
 //--------------------------------------------------------------
 void ofApp::draw() {
-	//ofBackground(backGroundColor);
 	ofSetColor(0, 0, 0, 5);
 	ofDrawRectangle(0, 0, window_width, window_height);
 	if (isDrawingGui) {
@@ -113,7 +111,6 @@ void ofApp::draw() {
 			ofSetColor(lineColor);
 		}
 		origin = ofVec2f(x, y);
-		//ofSetLineWidth(lineThickness);
 		ofDrawLine((**itr), origin);
 		angle += angleVar;
 	}
