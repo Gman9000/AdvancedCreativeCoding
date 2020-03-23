@@ -14,6 +14,7 @@ public:
 	ofParameter<int> numberOfPoints;
 	//ofParameter<ofColor> backGroundColor;
 	ofParameter<bool> timeToChangePoints;
+	ofParameter<bool> toggleColorChange;
 	ofParameter<string> screenShot;
 	bool isDrawingGui;
 
@@ -31,6 +32,13 @@ public:
 	//angle stuff
 	float startAngle = 0;
 	float angleVar = 0.1;
+
+	//color stuff
+	bool gotCurrentColorAlready;
+	bool gotChangingColorAlready;
+	ofColor color;
+	float hue;
+	float hueModifier;
 
 	void setup();
 	void update();

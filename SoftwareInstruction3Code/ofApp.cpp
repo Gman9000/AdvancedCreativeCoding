@@ -23,6 +23,7 @@ void ofApp::setup() {
 	gui.add(numberOfPoints.set("number of points", 100, 100, 200));
 	//gui.add(backGroundColor.set("Background Color", ofColor(0, 0, 0), ofColor(0), ofColor(255)));
 	gui.add(timeToChangePoints.set("Toggle Points", false));
+	gui.add(toggleColorChange.set("Toggle Changing Colors", false));
 	gui.add(screenShot.set("Screenshot"));
 
 	//point stuff
@@ -33,12 +34,40 @@ void ofApp::setup() {
 		points.push_back(new ofVec2f(randomX, randomY));
 	}
 	currentNumberOfPoints = numberOfPoints;
+	//color stuff
+	gotCurrentColorAlready = false;
+	gotChangingColorAlready = false;
+	color = lineColor;
+	hue = 0;
+	hueModifier = 0.1f;
 }
 
 //--------------------------------------------------------------
 void ofApp::update() {
 	startAngle += 0.015;
 	angle = startAngle;
+
+	if (toggleColorChange) {
+		if (!gotCurrentColorAlready) {
+			color = lineColor;
+			hue = color.getHue();
+			gotCurrentColorAlready = true;
+			gotChangingColorAlready = false;
+		}
+		hue += hueModifier;
+		if (hue >= 255) {
+			hue = 0;
+		}
+		color.setHue(hue);
+	}
+	else 
+	{
+		if (!gotChangingColorAlready) {
+			lineColor.set("Line Color", color, ofColor(0), ofColor(255));
+			gotChangingColorAlready = true;
+			gotCurrentColorAlready = false;
+		}
+	}
 
 	if ((window_width != ofGetWidth()) || (window_height != ofGetHeight()) || (currentNumberOfPoints != numberOfPoints)) {
 		points.clear();
@@ -70,20 +99,19 @@ void ofApp::draw() {
 	//ofBackground(backGroundColor);
 	ofSetColor(0, 0, 0, 5);
 	ofDrawRectangle(0, 0, window_width, window_height);
-	/*if (ofGetFrameNum() % 30 == 0) {
-		// draws a black background every 10 frames
-		ofSetColor(0, 0, 0, 125);
-		ofDrawRectangle(0, 0, window_width, window_height);
-		//ofBackground(0, 0, 0);
-		//ofSetBackgroundColor(0, 0, 0, 125);
-	}*/
 	if (isDrawingGui) {
 		gui.draw();
 	}
 	for (vector<ofVec2f*>::iterator itr = points.begin(); itr != points.end(); ++itr) {
 		float y = ofMap(sin(angle), -1, 1, 0, float(ofGetWindowHeight()));
 		float x = ofMap(cos(angle), -1, 1, 0, float(ofGetWindowWidth()));
-		ofSetColor(lineColor);
+		
+		if (toggleColorChange) {
+			ofSetColor(color);
+		}
+		else {
+			ofSetColor(lineColor);
+		}
 		origin = ofVec2f(x, y);
 		//ofSetLineWidth(lineThickness);
 		ofDrawLine((**itr), origin);
@@ -102,7 +130,7 @@ void ofApp::keyPressed(int key) {
 		screenShot.set("Screenshot Saved!");
 	}
 	//this is for clearing the screen purposes (developer functionality only)
-	else if (key = 'f') {
+	else if (key == 'f') {
 		ofSetColor(0, 0, 0);
 		ofDrawRectangle(0, 0, window_width, window_height);
 	}
