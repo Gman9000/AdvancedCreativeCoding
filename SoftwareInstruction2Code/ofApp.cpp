@@ -3,6 +3,7 @@ ofImage screenshottedImage;
 
 //--------------------------------------------------------------
 void ofApp::setup(){
+	//ofSetBackgroundAuto(false);
 	//screen size
 	window_width = 1000;
 	window_height = 1000;
@@ -16,6 +17,9 @@ void ofApp::setup(){
 	gui.add(numberOfPoints.set("number of points", 600, 100, 1000));
 	gui.add(backGroundColor.set("Background Color", ofColor(0, 0, 0), ofColor(0), ofColor(255)));
 	gui.add(timeToChangePoints.set("Toggle Points", false));
+	gui.add(variation1.set("Variation 1", true));
+	gui.add(variation2.set("Variation 2", false));
+	gui.add(variation3.set("Variation 3", false));
 	gui.add(screenShot.set("Screenshot"));
 
 	//point stuff
@@ -58,13 +62,32 @@ void ofApp::update(){
 //--------------------------------------------------------------
 void ofApp::draw(){
 	ofBackground(backGroundColor);
+	
 	if (isDrawingGui) {
 		gui.draw();
 	}
+	ofSetColor(lineColor);
 	for (vector<ofVec2f*>::iterator itr = points.begin(); itr != points.end(); ++itr) {
-		ofSetColor(lineColor);
 		//ofSetLineWidth(lineThickness);
 		ofDrawLine((**itr), origin);
+	}
+	if (variation1) {
+		variation2.set("Variation 2", false);
+		variation3.set("Variation 3", false);
+	}
+	else if (variation2) {
+		variation1.set("Variation 1", false);
+		variation3.set("Variation 3", false);
+		ofSetCircleResolution(3);
+		ofSetColor(backGroundColor);
+		ofDrawCircle(origin, 200);
+	}
+	else if (variation3) {
+		variation1.set("Variation 1", false);
+		variation2.set("Variation 2", false);
+		ofSetCircleResolution(4);
+		ofSetColor(backGroundColor);
+		ofDrawCircle(origin, 200);
 	}
 }
 

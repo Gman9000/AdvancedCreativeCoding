@@ -14,6 +14,9 @@ class ofApp : public ofBaseApp{
 		ofParameter<int> numberOfPoints;
 		ofParameter<ofColor> backGroundColor;
 		ofParameter<bool> timeToChangePoints;
+		ofParameter<bool> variation1;
+		ofParameter<bool> variation2;
+		ofParameter<bool> variation3;
 		ofParameter<string> screenShot;
 		bool isDrawingGui;
 
