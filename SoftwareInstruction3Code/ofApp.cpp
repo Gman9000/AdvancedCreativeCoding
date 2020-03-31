@@ -22,6 +22,10 @@ void ofApp::setup() {
 	gui.add(lineColor.set("Line Color", ofColor(0, 255, 255), ofColor(0), ofColor(255)));
 	gui.add(numberOfPoints.set("number of points", 100, 100, 200));
 	gui.add(timeToChangePoints.set("Toggle Points", false));
+	gui.add(variation1.set("Variation 1", true));
+	gui.add(variation2.set("Variation 2", false));
+	gui.add(variation3.set("Variation 3", false));
+	gui.add(variation4.set("Variation 4", false));
 	gui.add(toggleColorChange.set("Toggle Changing Colors", false));
 	gui.add(screenShot.set("Screenshot"));
 
@@ -32,13 +36,23 @@ void ofApp::setup() {
 		int randomY = ofRandom(0, window_height);
 		points.push_back(new ofVec2f(randomX, randomY));
 	}
-	currentNumberOfPoints = numberOfPoints;
+	currentNumberOfPoints = numberOfPoints;	
 	//color stuff
 	gotCurrentColorAlready = false;
 	gotChangingColorAlready = false;
 	color = lineColor;
 	hue = 0;
 	hueModifier = 0.1f;
+
+	//y boundary stuff
+	isIncreasingY = true;
+	normalY = 0;
+	normalYModifier = 0.1f;
+
+	//x boundary stuff
+	isIncreasingX = true;
+	normalX = 0;
+	normalXModifier = 0.1f;
 }
 
 //--------------------------------------------------------------
@@ -100,17 +114,64 @@ void ofApp::draw() {
 	if (isDrawingGui) {
 		gui.draw();
 	}
+	if (toggleColorChange) {
+		ofSetColor(color);
+	}
+	else {
+		ofSetColor(lineColor);
+	}
 	for (vector<ofVec2f*>::iterator itr = points.begin(); itr != points.end(); ++itr) {
 		float y = ofMap(sin(angle), -1, 1, 0, float(ofGetWindowHeight()));
 		float x = ofMap(cos(angle), -1, 1, 0, float(ofGetWindowWidth()));
-		
-		if (toggleColorChange) {
-			ofSetColor(color);
+		if (variation1) {
+			variation2.set("Variation 2", false);
+			variation3.set("Variation 3", false);
+			variation4.set("Variation 4", false);
+			origin = ofVec2f(x, y);	
 		}
-		else {
-			ofSetColor(lineColor);
+		else if (variation2) {
+			variation1.set("Variation 1", false);
+			variation3.set("Variation 3", false);
+			variation4.set("Variation 4", false);
+			origin = ofVec2f(window_width / 2, y);
 		}
-		origin = ofVec2f(x, y);
+		else if (variation3) {
+			variation1.set("Variation 1", false);
+			variation2.set("Variation 2", false);
+			variation4.set("Variation 4", false);
+			if (isIncreasingY) {
+				normalY -= normalYModifier;
+				if (normalY <= 0) {
+					isIncreasingY = false;
+				}
+			}
+			else {
+				normalY += normalYModifier;
+				if (normalY >= window_height) {
+					isIncreasingY = true;
+				}
+			}
+			origin = ofVec2f(x, normalY);
+		}
+		else if (variation4) {
+			variation1.set("Variation 1", false);
+			variation2.set("Variation 2", false);
+			variation3.set("Variation 3", false);
+			if (isIncreasingX) {
+				normalX += normalXModifier;
+				if (normalX >= window_width) {
+					isIncreasingX = false;
+				}
+			}
+			else {
+				normalX -= normalXModifier;
+				if (normalX <= 0) {
+					isIncreasingX = true;
+				}
+			}
+			origin = ofVec2f(normalX, y);
+		}
+
 		ofDrawLine((**itr), origin);
 		angle += angleVar;
 	}

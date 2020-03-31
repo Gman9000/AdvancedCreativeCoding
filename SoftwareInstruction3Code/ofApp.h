@@ -12,6 +12,10 @@ public:
 	ofParameter<ofColor> lineColor;
 	ofParameter<int> numberOfPoints;
 	ofParameter<bool> timeToChangePoints;
+	ofParameter<bool> variation1;
+	ofParameter<bool> variation2;
+	ofParameter<bool> variation3;
+	ofParameter<bool> variation4;
 	ofParameter<bool> toggleColorChange;
 	ofParameter<string> screenShot;
 	bool isDrawingGui;
@@ -37,6 +41,16 @@ public:
 	ofColor color;
 	float hue;
 	float hueModifier;
+
+	//y boundary stuff
+	bool isIncreasingY;
+	float normalY;
+	float normalYModifier;
+
+	//x boundary stuff
+	bool isIncreasingX;
+	float normalX;
+	float normalXModifier;
 
 	void setup();
 	void update();
