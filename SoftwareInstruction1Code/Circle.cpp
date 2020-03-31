@@ -10,9 +10,9 @@ Circle::Circle()
 	window_width = 1000;
 	window_height = 1000;
 	minMovementSpeedX = 1;
-	maxMovementSpeedX = 5;
+	maxMovementSpeedX = 3;
 	minMovementSpeedY = 1;
-	maxMovementSpeedY = 5;
+	maxMovementSpeedY = 3;
 	isGoingRight = true;
 	isGoingUp = false;
 }
@@ -24,9 +24,9 @@ Circle::Circle(int xPos, int yPos, float circleRadius, int circleRes, int win_wi
 	window_width = win_widt;
 	window_height = win_height;
 	minMovementSpeedX = 1;
-	maxMovementSpeedX = 4;
+	maxMovementSpeedX = 3;
 	minMovementSpeedY = 1;
-	maxMovementSpeedY = 4;
+	maxMovementSpeedY = 3;
 	isGoingRight = true;
 	isGoingUp = false;
 }
@@ -34,15 +34,43 @@ Circle::Circle(int xPos, int yPos, float circleRadius, int circleRes, int win_wi
 void Circle::drawCircle(ofColor color) {
 	if (x >= window_width - radius) {
 		setIsGoingRight(false);
+		//flip a coin and set the direction of the vertical accordingly
+		if (round(ofRandom(0, 1))) {
+			setIsGoingUp(true);
+		}
+		else {
+			setIsGoingUp(false);
+		}
 	}
 	else if (x <= radius) {
 		setIsGoingRight(true);
+		//flip a coin and set the direction of the vertical accordingly
+		if (round(ofRandom(0, 1))) {
+			setIsGoingUp(true);
+		}
+		else {
+			setIsGoingUp(false);
+		}
 	}
 	if (y >= window_height - radius) {
 		setIsGoingUp(true);
+		//flip a coin and set the direction of the horizontal accordingly
+		if (round(ofRandom(0, 1))) {
+			setIsGoingRight(true);
+		}
+		else {
+			setIsGoingRight(false);
+		}
 	}
 	else if (y <= radius) {
 		setIsGoingUp(false);
+		//flip a coin and set the direction of the horizontal accordingly
+		if (round(ofRandom(0, 1))) {
+			setIsGoingRight(true);
+		}
+		else {
+			setIsGoingRight(false);
+		}
 	}
 	
 	if (isGoingRight) {
@@ -66,14 +94,25 @@ void Circle::drawCircle(ofColor color) {
 void Circle::drawSurroundingCircles(ofColor color) {
 	//draw a circle temporarily for north/south/east/west
 	ofSetColor(color);
+	ofNoFill();
 	//north
-	ofDrawCircle(x, y-radius, radius/4);
+	ofDrawCircle(x, y-radius, radius/3);
 	//south
-	ofDrawCircle(x, y+radius, radius/4);
+	ofDrawCircle(x, y+radius, radius/3);
 	//east
-	ofDrawCircle(x+radius, y, radius/4);
+	ofDrawCircle(x+radius, y, radius/3);
 	//west
-	ofDrawCircle(x-radius, y, radius/4);
+	ofDrawCircle(x-radius, y, radius/3);
+}
+
+void Circle::drawOrbitingCircle(ofColor color, float cosNorthX, float sinNorthY, float cosSouthX, float sinSouthY, float cosEastX, float sinEastY, float cosWestX, float sinWestY) {
+	ofSetColor(color);
+	ofSetCircleResolution(3);
+	ofFill();
+	ofDrawCircle(cosNorthX, sinNorthY, radius / 3);
+	ofDrawCircle(cosSouthX, sinSouthY, radius / 3);
+	ofDrawCircle(cosEastX, sinEastY, radius / 3);
+	ofDrawCircle(cosWestX, sinWestY, radius / 3);
 }
 
 

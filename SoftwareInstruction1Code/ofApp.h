@@ -4,6 +4,7 @@
 #include "ofxGui.h"
 #include "Circle.h"
 
+
 /*
 My first instruction: A surface filled with circles of the same size moving at a relatively slow speed. 
 Show the intersections of any circles that come into contact with each other but do not show the intersecting circles themselves.
@@ -16,6 +17,10 @@ class ofApp : public ofBaseApp{
 		ofParameter<ofColor> lineColor;
 		ofParameter<int> lineThickness;
 		ofParameter<ofColor> backGroundColor;
+		ofParameter<bool> timeToChangeCircles;
+		ofParameter<bool> variation1;
+		ofParameter<bool> variation2;
+		ofParameter<bool> variation3;
 		ofParameter<string> screenShot;
 		bool isDrawingGui;
 
@@ -23,8 +28,6 @@ class ofApp : public ofBaseApp{
 		vector<Circle*> circles;
 		
 		//i'm hardcoding certain circle properties properties because i don't want to have this controlled by the gui
-		//int minRadius = 25;
-		//int maxRadius = 50;
 		int radius = 30;
 		int resolution = 40;
 
@@ -34,6 +37,23 @@ class ofApp : public ofBaseApp{
 
 		// collision detection stuff
 		int distanceBetweenTwoPoints(int x, int y, int a, int b);
+
+		//angle stuff
+		float startAngleModifier;
+		float startNorthAngle;
+		float startSouthAngle;
+		float startEastAngle;
+		float startWestAngle;
+		float angleVar;
+		float sinNorthY;
+		float cosNorthX;
+		float sinSouthY;
+		float cosSouthX;
+		float sinEastY;
+		float cosEastX;
+		float sinWestY;
+		float cosWestX;
+		
 
 		void setup();
 		void update();

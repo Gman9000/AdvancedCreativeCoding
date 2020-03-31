@@ -31,6 +31,6 @@ public:
 	void setIsGoingRight(bool newBool);
 	void setIsGoingUp(bool newBool);
 	void drawSurroundingCircles(ofColor color);
-
+	void drawOrbitingCircle(ofColor color,float cosNorthX, float sinNorthY, float cosSouthX, float sinSouthY, float cosEastX, float sinEastY, float cosWestX, float sinWestY);
 };
 
