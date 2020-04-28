@@ -6,10 +6,83 @@ float angle = 0;
 
 //--------------------------------------------------------------
 void ofApp::setup(){
+	// Testing redirects and https.
+	// This server will echo back everything that you send to it.
+	//This is to get one specific song
+	urlBase = "https://api.spotify.com/v1/search";
+	urlSearch = "?q=Elixia&type=track";
+	
+	// Create a client.
+	ofxHTTP::Client client;
+
+	// Create a request.
+	ofxHTTP::GetRequest request(urlBase + urlSearch);
+
+	// Create a context.
+	ofxHTTP::Context context;
+
+	// Set custom session settings.
+	//
+	// See the class documentation for many additional settings.
+	ofxHTTP::ClientSessionSettings sessionSettings;
+	// Set a 60 second keep-alive timeout (default is 8 seconds).
+	sessionSettings.setKeepAliveTimeout(Poco::Timespan::SECONDS * 60);
+
+	// Save the session settings with the context.
+	context.setClientSessionSettings(sessionSettings);
+
+	try
+	{
+		// Execute the request within the given context.
+		auto response = client.execute(context, request);
+
+		// Check the response.
+		if (response->getStatus() == Poco::Net::HTTPResponse::HTTP_OK)
+		{
+			// A successful response.
+			ofLogNotice("ofApp::setup") << "Response success, expecting " << response->estimatedContentLength() << " bytes.";
+
+			// Buffer the response, or otherwise consume the stream.
+			ofBuffer buffer(response->stream());
+
+			ofLogNotice("ofApp::setup") << "Content Begin";
+
+			std::cout << buffer << std::endl;
+
+			ofLogNotice("ofApp::setup") << "Content End";
+		}
+		else
+		{
+			ofLogError("ofApp::setup") << response->getStatus() << " " << response->getReason();
+		}
+	}
+	catch (const Poco::Exception& exc)
+	{
+		ofLogError("ofApp::setup") << exc.displayText();
+		//YO IT ALWAYS BE CATCHING THIS ERROR SON
+		// ERROR: [ error ] ofApp::setup: I/O error: No port can be determined for request.
+	}
+	catch (const std::exception& exc)
+	{
+		ofLogError("ofApp::setup") << exc.what();
+	}
+	
+	//MAKE A CALL
+	//GET THE SONG
+	//PLAY THE SONG
+
+
+
+	/*ofGLFWWindowSettings settings;
+	settings.setGLVersion(3, 2);
+	shader.load("shadersGL3/shader");
+	*/
+
 	ofNoFill();
 	isDrawingGui = true;
 	gui.setup("X->hide|S->screenshot");
 	//gui.setup("enter->toggler music");
+	gui.add(musicVolume.set("Music Volume", 1.0f, 0.0f, 1.0f));
 	gui.add(lineThickness.set("Line Thickness", 1, 1, 20));
 	gui.add(circleResolution.set("Circle Resolution", 4, 3, 30));
 	gui.add(circleRadius.set("Circle Radius", 1000, 100, 1000));
@@ -17,7 +90,7 @@ void ofApp::setup(){
 	gui.add(triggerMusicVisualization.set("Trigger Visualz!", false));
 	//gui.add(circleResolution.set("Circle Resolution", 4, 3, 30));
 	gui.add(musicVisualizationChilltensity.set("visualz Chilltensity", 10, 1, 10));
-	gui.add(bands.set("band number", 64, 4, 64)); 
+	gui.add(bands.set("band number", 64, 4, 128)); 
 	gui.add(triggerXMotion.set("Trigger X Motion!", false));
 	gui.add(triggerYMotion.set("Trigger Y Motion!", false));
 	gui.add(triggerMultiColorGradient.set("Trigger Multi Gradient!", false));
@@ -74,6 +147,7 @@ void ofApp::setup(){
 //--------------------------------------------------------------
 void ofApp::update(){
 	//music handling 
+	myPlayer.setVolume(musicVolume);
 	ofSoundUpdate();
 	float * value = ofSoundGetSpectrum(bands);
 	for (int i = 0; i < bands; i++) {
@@ -274,6 +348,7 @@ void ofApp::generateFractalCircle(int xPos, int yPos, int radius) {
 		generateFractalCircle(xPos + (radius / 2), yPos, radius / 2);
 	}
 	//circles.push_back(new FractalCircle(ofGetWindowWidth()/2, ofGetWindowHeight()/2, 300, 12));
+	//circles.push_back(new FractalCircle(xPos, yPos, radius, currentCircleResolution, shader));
 	circles.push_back(new FractalCircle(xPos, yPos, radius, currentCircleResolution));
 
 }

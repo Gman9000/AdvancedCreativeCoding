@@ -10,6 +10,15 @@ FractalCircle::FractalCircle()
 }
 
 
+/*FractalCircle::FractalCircle(int xPos, int yPos, float circleRadius, int circleRes, ofShader& shader){
+	x = xPos;
+	y = yPos;
+	radius = circleRadius;
+	originalRadius = circleRadius;
+	circleResolution = circleRes;
+	theShader = shader;
+}*/
+
 FractalCircle::FractalCircle(int xPos, int yPos, float circleRadius, int circleRes){
 	x = xPos;
 	y = yPos;
@@ -28,7 +37,14 @@ void FractalCircle::drawCircle(ofColor color)
 {
 	ofSetCircleResolution(circleResolution);
 	ofSetColor(color);
+	//theShader.begin();
+	//float shapeColor[4] = { color.r, color.g, color.b, color.a };
+	//theShader.setUniform4fv("shapeColor", shapeColor);
+	//theShader.end();
 	ofDrawCircle(x, y, radius);
+
+
+	//ofSetColor(color);
 }
 void FractalCircle::drawCircleY(float yPos, ofColor color) {
 	ofSetCircleResolution(circleResolution);

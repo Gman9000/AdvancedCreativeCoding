@@ -9,10 +9,12 @@ private:
 	float radius;
 	float originalRadius;
 	int circleResolution;
+	ofShader theShader;
 public:
 	float getOriginalRadius();
 	void setRadius(float newRadius);
 	FractalCircle();	
+	//FractalCircle(int xPos, int yPos, float circleRadius, int circleRes, ofShader& shader);
 	FractalCircle(int xPos, int yPos, float circleRadius, int circleRes);
 	void drawCircle(ofColor color);
 	void drawCircleY(float yPos,ofColor color);

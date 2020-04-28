@@ -3,15 +3,22 @@
 #include "ofMain.h"
 #include "ofxGui.h"
 #include "FractalCircle.h"
+#include "ofxHTTP.h"
+
 class ofApp : public ofBaseApp{
 
 	public:
+		//SPOTIFY API VARIABLES
+		string urlBase;
+		string urlSearch;
 		void setup();
 		void update();
 		void draw();
 
+		//ofShader shader;
 
 		ofxPanel gui;
+		ofParameter<float> musicVolume;
 		ofParameter<int> lineThickness;
 		ofParameter<int> circleResolution;
 		ofParameter<float> circleRadius;
