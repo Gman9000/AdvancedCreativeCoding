@@ -6,66 +6,7 @@ float angle = 0;
 
 //--------------------------------------------------------------
 void ofApp::setup(){
-	// Testing redirects and https.
-	// This server will echo back everything that you send to it.
-	//This is to get one specific song
-	urlBase = "https://api.spotify.com/v1/search";
-	urlSearch = "?q=Elixia&type=track";
-	
-	// Create a client.
-	ofxHTTP::Client client;
-
-	// Create a request.
-	ofxHTTP::GetRequest request(urlBase + urlSearch);
-
-	// Create a context.
-	ofxHTTP::Context context;
-
-	// Set custom session settings.
-	//
-	// See the class documentation for many additional settings.
-	ofxHTTP::ClientSessionSettings sessionSettings;
-	// Set a 60 second keep-alive timeout (default is 8 seconds).
-	sessionSettings.setKeepAliveTimeout(Poco::Timespan::SECONDS * 60);
-
-	// Save the session settings with the context.
-	context.setClientSessionSettings(sessionSettings);
-
-	try
-	{
-		// Execute the request within the given context.
-		auto response = client.execute(context, request);
-
-		// Check the response.
-		if (response->getStatus() == Poco::Net::HTTPResponse::HTTP_OK)
-		{
-			// A successful response.
-			ofLogNotice("ofApp::setup") << "Response success, expecting " << response->estimatedContentLength() << " bytes.";
-
-			// Buffer the response, or otherwise consume the stream.
-			ofBuffer buffer(response->stream());
-
-			ofLogNotice("ofApp::setup") << "Content Begin";
-
-			std::cout << buffer << std::endl;
-
-			ofLogNotice("ofApp::setup") << "Content End";
-		}
-		else
-		{
-			ofLogError("ofApp::setup") << response->getStatus() << " " << response->getReason();
-		}
-	}
-	catch (const Poco::Exception& exc)
-	{
-		ofLogError("ofApp::setup") << exc.displayText();
-		//YO IT ALWAYS BE CATCHING THIS ERROR SON
-		// ERROR: [ error ] ofApp::setup: I/O error: No port can be determined for request.
-	}
-	catch (const std::exception& exc)
-	{
-		ofLogError("ofApp::setup") << exc.what();
-	}
+	receiver.setup(8080);
 	
 	//MAKE A CALL
 	//GET THE SONG
@@ -99,6 +40,8 @@ void ofApp::setup(){
 	gui.add(singleFractalColor.set("Single Fractal Color", ofColor(255, 0, 0), ofColor(0), ofColor(255)));
 	gui.add(backGroundColor.set("Background Color", ofColor(0, 0, 0), ofColor(0), ofColor(255)));
 	gui.add(screenShot.set("Screenshot"));
+	gui.add(spotifySearch.set("SongTitleSearch"));
+
 
 	hue = 0;
 	hueModifier = 0.1f;
@@ -146,6 +89,20 @@ void ofApp::setup(){
 
 //--------------------------------------------------------------
 void ofApp::update(){
+
+	while (receiver.hasWaitingMessages()) {
+		ofxOscMessage rMsg;
+		receiver.getNextMessage(rMsg);
+		if (rMsg.getAddress() == "/energy") {
+			energy = rMsg.getArgAsFloat(0);
+			ofLog(OF_LOG_NOTICE, "the energy of the song is " + ofToString(energy));
+		}
+		else if (rMsg.getAddress() == "/tempo") {
+			tempo = rMsg.getArgAsFloat(0);
+			ofLog(OF_LOG_NOTICE, "the tempo of the song is " + ofToString(tempo));
+		}
+		
+	}
 	//music handling 
 	myPlayer.setVolume(musicVolume);
 	ofSoundUpdate();
@@ -357,12 +314,20 @@ void ofApp::keyPressed(int key){
 	if (key == 'x') {
 		isDrawingGui = !isDrawingGui;
 	}
-	else if (key == 's') {
+	else if (key == OF_KEY_RETURN) {
+		ofxOscMessage message;
+		message.setAddress("/userSearch");
+		message.addStringArg(spotifySearch.toString());
+		sender.sendMessage(message);
+		ofLog(OF_LOG_NOTICE, "the message is sent");
+
+	}
+	else if (key == OF_KEY_PAGE_UP) {
 		screenshottedImage.grabScreen(0, 0, ofGetWidth(), ofGetHeight());
 		screenshottedImage.save(screenShot.toString() + ".png");
 		screenShot.set("Screenshot Saved!");
 	}
-	else if (key == OF_KEY_RETURN) {
+	else if (key == OF_KEY_DEL) {
 		if (!isMusicPaused) {
 			isMusicPaused = true;
 			if (triggerMusicVisualization) {

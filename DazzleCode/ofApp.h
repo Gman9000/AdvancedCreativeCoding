@@ -3,11 +3,21 @@
 #include "ofMain.h"
 #include "ofxGui.h"
 #include "FractalCircle.h"
-#include "ofxHTTP.h"
+#include "ofxOsc.h"
+
 
 class ofApp : public ofBaseApp{
 
 	public:
+		//osc stuff
+		ofxOscSender sender;
+		ofxOscReceiver receiver;
+		float timeSent, timeReceived;
+
+		// relates to volume of the song
+		float energy;
+		float tempo;
+
 		//SPOTIFY API VARIABLES
 		string urlBase;
 		string urlSearch;
@@ -33,6 +43,8 @@ class ofApp : public ofBaseApp{
 		ofParameter<int> gradientShifter;
 		ofParameter<ofColor> backGroundColor;
 		ofParameter<ofColor> singleFractalColor;
+		ofParameter<string> screenShot;
+		ofParameter<string> spotifySearch;
 		ofColor color;
 		float hue;
 		float hueModifier;
@@ -53,7 +65,7 @@ class ofApp : public ofBaseApp{
 		bool isIncreasingCircleResolution;
 		int maxCircleResolution;
 		int minCircleResolution;
-		ofParameter<string> screenShot;
+		
 		bool isDrawingGui;
 		float currentFractalThreshold;
 		float currentCircleRadius;
