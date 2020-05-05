@@ -13,6 +13,7 @@ private:
 public:
 	float getOriginalRadius();
 	void setRadius(float newRadius);
+	float getCurrentRadius();
 	FractalCircle();	
 	//FractalCircle(int xPos, int yPos, float circleRadius, int circleRes, ofShader& shader);
 	FractalCircle(int xPos, int yPos, float circleRadius, int circleRes);

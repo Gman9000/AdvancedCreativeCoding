@@ -17,6 +17,12 @@ class ofApp : public ofBaseApp{
 		// relates to volume of the song
 		float energy;
 		float tempo;
+		bool searchedForASong;
+		bool receivedData;
+		int beatPerFrameValue;
+
+		float valence;
+		int frameNumberSinceSearch;
 
 		//SPOTIFY API VARIABLES
 		string urlBase;
@@ -34,7 +40,9 @@ class ofApp : public ofBaseApp{
 		ofParameter<float> circleRadius;
 		ofParameter<float> fractalThreshold;
 		ofParameter<bool> triggerMusicVisualization;
-		ofParameter<int> musicVisualizationChilltensity;
+		//ofParameter<int> musicVisualizationChilltensity;
+		ofParameter<int> pulseIntensity;
+		ofParameter<int> startingPulseSizeOffset;
 		ofParameter<int> bands;
 		ofParameter<bool> triggerXMotion;
 		ofParameter<bool> triggerYMotion;

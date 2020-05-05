@@ -6,31 +6,28 @@ float angle = 0;
 
 //--------------------------------------------------------------
 void ofApp::setup(){
+	// recievers only need ports
+	// senders need ip and ports
 	receiver.setup(8080);
-	
-	//MAKE A CALL
-	//GET THE SONG
-	//PLAY THE SONG
-
-
-
-	/*ofGLFWWindowSettings settings;
-	settings.setGLVersion(3, 2);
-	shader.load("shadersGL3/shader");
-	*/
+	sender.setup("127.0.0.1", 8082);
+	ofSetFrameRate(30);
+	searchedForASong = false;
+	receivedData = false;
 
 	ofNoFill();
 	isDrawingGui = true;
 	gui.setup("X->hide|S->screenshot");
 	//gui.setup("enter->toggler music");
 	gui.add(musicVolume.set("Music Volume", 1.0f, 0.0f, 1.0f));
-	gui.add(lineThickness.set("Line Thickness", 1, 1, 20));
+	//gui.add(lineThickness.set("Line Thickness", 1, 1, 20));
 	gui.add(circleResolution.set("Circle Resolution", 4, 3, 30));
 	gui.add(circleRadius.set("Circle Radius", 1000, 100, 1000));
 	gui.add(fractalThreshold.set("Fractal Threshold", 0.002, 0.002, 300));
 	gui.add(triggerMusicVisualization.set("Trigger Visualz!", false));
+	gui.add(pulseIntensity.set("Pulse Intensity", 1, 1, 10));
+	gui.add(startingPulseSizeOffset.set("Starting Pulse Size Offset", 5, 0, 50));
 	//gui.add(circleResolution.set("Circle Resolution", 4, 3, 30));
-	gui.add(musicVisualizationChilltensity.set("visualz Chilltensity", 10, 1, 10));
+	//gui.add(musicVisualizationChilltensity.set("visualz Chilltensity", 10, 1, 10));
 	gui.add(bands.set("band number", 64, 4, 128)); 
 	gui.add(triggerXMotion.set("Trigger X Motion!", false));
 	gui.add(triggerYMotion.set("Trigger Y Motion!", false));
@@ -66,8 +63,10 @@ void ofApp::setup(){
 	maxGradientShift = 255;
 	minGradientShift = 0;
 	
-	//MUSIC HANDLING
-	isMusicPaused = false;
+	/* //MUSIC HANDLING
+	//make this true for now so that i can play spotify music
+	//isMusicPaused = false;
+	isMusicPaused = true;
 	hasPausedVisualizations = false;
 	musicCounter = 0;
 	myPlayer.load(musicList[musicCounter] + ".mp3");
@@ -77,13 +76,15 @@ void ofApp::setup(){
 	}
 	//we are just messing with shapes so we don't need a high band
 	//bands = 64; //EDITING THIS IN GUI BEFORE MAKING IT PERMANENT
-	myPlayer.play();
+	//commenting this out for now
+	//myPlayer.play();
 	//myPlayer.setVolume(0);
 	toggleVisuals = false;
+	
 
 	//hackandslash
 	previousTempCalculation = 0.0f;
-	calculationThreshold = 1.0f;
+	calculationThreshold = 1.0f;*/
 
 }
 
@@ -95,15 +96,61 @@ void ofApp::update(){
 		receiver.getNextMessage(rMsg);
 		if (rMsg.getAddress() == "/energy") {
 			energy = rMsg.getArgAsFloat(0);
-			ofLog(OF_LOG_NOTICE, "the energy of the song is " + ofToString(energy));
+			//OSC handling energy level to circle resolution combo
+			circleResolution = ofMap(energy, 0.0f, 1.0f, 30, 3);
+			//ofLog(OF_LOG_NOTICE, "the energy of the song is " + ofToString(energy));
 		}
 		else if (rMsg.getAddress() == "/tempo") {
-			tempo = rMsg.getArgAsFloat(0);
-			ofLog(OF_LOG_NOTICE, "the tempo of the song is " + ofToString(tempo));
+			tempo = roundf(rMsg.getArgAsFloat(0));
+			float bpm = tempo / 60.0f;
+			float setFrameRate = 1.0f / 30.0f;
+			float intermediaryStep = (bpm * setFrameRate);
+
+			//ofLog(OF_LOG_NOTICE, "the bpm is " + ofToString(bpm));
+			//ofLog(OF_LOG_NOTICE, "the setFrameRate is " + ofToString(setFrameRate));
+			//ofLog(OF_LOG_NOTICE, "the intermediaryStep is " + ofToString(intermediaryStep));
+			beatPerFrameValue = roundf(1.0f/intermediaryStep);
+			//ofLog(OF_LOG_NOTICE, "the beatPerFrameValue is " + ofToString(beatPerFrameValue));
+			// 1/ (tempo/60seconds * 1 second/30 frames (my framerate) ) is the formula
+			//and we gotta round it nicely
+			//tempo = rMsg.getArgAsFloat(0);
+			//ofLog(OF_LOG_NOTICE, "the tempo of the song is " + ofToString(tempo));
+			receivedData = true;
+		}
+		else if (rMsg.getAddress() == "/valence") {
+			valence = rMsg.getArgAsFloat(0);
+			//ofLog(OF_LOG_NOTICE, "the tempo of the song is " + ofToString(tempo));
+			//OSC handling valence level to circle thickness combo
+			lineThickness = ofMap(valence, 0.0f, 1.0f, 1, 5);
 		}
 		
 	}
-	//music handling 
+	for (vector<FractalCircle*>::iterator itr = circles.begin(); itr != circles.end(); ++itr) {
+		if (searchedForASong && receivedData && triggerMusicVisualization) {
+			if ((ofGetFrameNum() - frameNumberSinceSearch) % beatPerFrameValue == 0) {
+				(*itr)->setRadius((*itr)->getOriginalRadius() + startingPulseSizeOffset);
+			}
+			else {
+				(*itr)->setRadius((*itr)->getCurrentRadius() - pulseIntensity);
+			}
+		}
+		else {
+			(*itr)->setRadius((*itr)->getOriginalRadius());
+		}
+	}
+	//osc handling tempo somehow
+	//circleRadius = 100;
+	//ofLog(OF_LOG_NOTICE, "the beatPerFrameValue is " + ofToString(beatPerFrameValue));
+	/*if (searchedForASong && receivedData) {
+		if ((ofGetFrameNum() - frameNumberSinceSearch) % beatPerFrameValue == 0) {
+
+			circleRadius = 1000;
+		}
+		circleRadius = MIN(1000, circleRadius - 5);
+	}*/
+	//do stuff with the tempo variable
+
+	/* //music handling 
 	myPlayer.setVolume(musicVolume);
 	ofSoundUpdate();
 	float * value = ofSoundGetSpectrum(bands);
@@ -121,7 +168,7 @@ void ofApp::update(){
 		}
 		myPlayer.load(musicList[musicCounter] + ".mp3");
 		myPlayer.play();
-	}
+	}*/
 
 	startAngle += 0.015;
 	angle = startAngle;
@@ -160,6 +207,7 @@ void ofApp::update(){
 		currentCircleResolution = circleResolution;
 		generateFractalCircle(window_width / 2, window_height / 2, circleRadius);
 	}
+
 }
 
 //--------------------------------------------------------------
@@ -169,7 +217,8 @@ void ofApp::draw(){
 		{
 			for (vector<FractalCircle*>::iterator itr = circles.begin(); itr != circles.end(); ++itr) {
 				float x = ofMap(cos(angle), -1, 1, 0, float(ofGetWindowWidth()));
-				if (triggerMusicVisualization) {
+
+				/*if (triggerMusicVisualization) {
 					
 					for (int i = 0; i < bands; i++) {
 						float tempCalculation = (*itr)->getOriginalRadius() + abs((fftSmooth[i] * (*itr)->getOriginalRadius()) / musicVisualizationChilltensity);
@@ -184,23 +233,23 @@ void ofApp::draw(){
 						}
 						previousTempCalculation = tempCalculation;
 					}
+				}*/
+				//else {
+				//(*itr)->setRadius((*itr)->getOriginalRadius());
+				if (triggerMultiColorGradient) {
+					(*itr)->drawCircleX(x, color);
 				}
 				else {
-					(*itr)->setRadius((*itr)->getOriginalRadius());
-					if (triggerMultiColorGradient) {
-						(*itr)->drawCircleX(x, color);
-					}
-					else {
-						(*itr)->drawCircleX(x, singleFractalColor);
-					}
+					(*itr)->drawCircleX(x, singleFractalColor);
 				}
+				//}
 				angle += angleVar;
 			}
 		}
 		else if (!triggerXMotion && triggerYMotion) {
 			for (vector<FractalCircle*>::iterator itr = circles.begin(); itr != circles.end(); ++itr) {
 				float y = ofMap(sin(angle), -1, 1, 0, float(ofGetWindowHeight()));
-				if (triggerMusicVisualization) {
+				/*if (triggerMusicVisualization) {
 					for (int i = 0; i < bands; i++) { 
 						float tempCalculation = (*itr)->getOriginalRadius() + abs( (fftSmooth[i] * (*itr)->getOriginalRadius()) / musicVisualizationChilltensity);
 						if (abs(tempCalculation - previousTempCalculation) > calculationThreshold) {
@@ -214,17 +263,17 @@ void ofApp::draw(){
 						}
 						previousTempCalculation = tempCalculation;
 					}
+				}*/
+				//else {
+				//(*itr)->setRadius((*itr)->getOriginalRadius());
+				if (triggerMultiColorGradient) {
+					(*itr)->drawCircleY(y, color);
 				}
 				else {
-					(*itr)->setRadius((*itr)->getOriginalRadius());
-					if (triggerMultiColorGradient) {
-						(*itr)->drawCircleY(y, color);
-					}
-					else {
-						(*itr)->drawCircleY(y, singleFractalColor);
-					}
-
+					(*itr)->drawCircleY(y, singleFractalColor);
 				}
+
+				//}
 				angle += angleVar;
 			}
 
@@ -234,7 +283,7 @@ void ofApp::draw(){
 			for (vector<FractalCircle*>::iterator itr = circles.begin(); itr != circles.end(); ++itr) {
 				float y = ofMap(sin(angle), -1, 1, 0, float(ofGetWindowHeight()));
 				float x = ofMap(cos(angle), -1, 1, 0, float(ofGetWindowWidth()));
-				if (triggerMusicVisualization) {
+				/*if (triggerMusicVisualization) {
 					for (int i = 0; i < bands; i++) {
 						float tempCalculation = (*itr)->getOriginalRadius() + abs((fftSmooth[i] * (*itr)->getOriginalRadius()) / musicVisualizationChilltensity);
 						if (abs(tempCalculation - previousTempCalculation) > calculationThreshold) {
@@ -248,23 +297,24 @@ void ofApp::draw(){
 						}
 						previousTempCalculation = tempCalculation;
 					}
+				}*/
+				//else {
+				//(*itr)->setRadius((*itr)->getOriginalRadius());
+				if (triggerMultiColorGradient) {
+					(*itr)->drawCircleXY(x, y, color);
 				}
 				else {
-					(*itr)->setRadius((*itr)->getOriginalRadius());
-					if (triggerMultiColorGradient) {
-						(*itr)->drawCircleXY(x, y, color);
-					}
-					else {
-						(*itr)->drawCircleXY(x, y, singleFractalColor);
-					}
+					(*itr)->drawCircleXY(x, y, singleFractalColor);
 				}
+				//}
 				angle += angleVar;
 			}
 		}
 		else
 		{
 			for (vector<FractalCircle*>::iterator itr = circles.begin(); itr != circles.end(); ++itr) {
-				if (triggerMusicVisualization) {
+
+				/*if (triggerMusicVisualization) {
 					for (int i = 0; i < bands; i++) {
 						float tempCalculation = (*itr)->getOriginalRadius() + abs((fftSmooth[i] * (*itr)->getOriginalRadius()) / musicVisualizationChilltensity);
 						if (abs(tempCalculation - previousTempCalculation) > calculationThreshold) {
@@ -278,16 +328,16 @@ void ofApp::draw(){
 						}
 						previousTempCalculation = tempCalculation;
 					}
+				}*/
+				//else {
+				//(*itr)->setRadius((*itr)->getOriginalRadius());
+				if (triggerMultiColorGradient) {
+					(*itr)->drawCircle(color);
 				}
 				else {
-					(*itr)->setRadius((*itr)->getOriginalRadius());
-					if (triggerMultiColorGradient) {
-						(*itr)->drawCircle(color);
-					}
-					else {
-						(*itr)->drawCircle(singleFractalColor);
-					}
+					(*itr)->drawCircle(singleFractalColor);
 				}
+				//}
 			}
 		}
 
@@ -319,7 +369,10 @@ void ofApp::keyPressed(int key){
 		message.setAddress("/userSearch");
 		message.addStringArg(spotifySearch.toString());
 		sender.sendMessage(message);
-		ofLog(OF_LOG_NOTICE, "the message is sent");
+		frameNumberSinceSearch = ofGetFrameNum();
+		searchedForASong = true;
+		receivedData = false;
+		//ofLog(OF_LOG_NOTICE, ofToString(frameNumberSinceSearch));
 
 	}
 	else if (key == OF_KEY_PAGE_UP) {

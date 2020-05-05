@@ -30,6 +30,11 @@ FractalCircle::FractalCircle(int xPos, int yPos, float circleRadius, int circleR
 float FractalCircle::getOriginalRadius() {
 	return originalRadius;
 }
+
+float FractalCircle::getCurrentRadius() {
+	return radius;
+}
+
 void FractalCircle::setRadius(float newRadius) {
 	radius = newRadius;
 }
